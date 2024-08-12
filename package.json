@@ -10,7 +10,15 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^9.6.0",
+    "crypto-random-string": "^5.0.0",
     "nuxt": "^3.12.4",
+    "nuxt-auth-utils": "^0.2.1",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/better-sqlite3": "^7.6.11"
   }
 }

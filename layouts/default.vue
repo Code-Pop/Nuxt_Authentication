@@ -1,8 +1,19 @@
+<script setup lang="ts">
+const { loggedIn, clear } = useUserSession()
+
+const logout = async () => {
+  await clear()
+  window.location.href = '/login'
+}
+</script>
+
 <template>
   <div>
     <div class="nav">
       <NuxtLink href="/">Home</NuxtLink>
-      <NuxtLink href="/dashboard">Dashboard</NuxtLink>
+      <NuxtLink v-if="loggedIn" href="/dashboard">Dashboard</NuxtLink>
+      <NuxtLink v-if="loggedIn" @click="logout">Logout</NuxtLink>
+      <NuxtLink v-else href="/login">Login</NuxtLink>
     </div>
     <slot />
   </div>

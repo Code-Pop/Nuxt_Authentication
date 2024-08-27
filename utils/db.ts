@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 import cryptoRandomString from 'crypto-random-string'
 import bcrypt from 'bcrypt'
 
-export const db = new Database('db.sqlite', { verbose: console.log })
+export const db = new Database('db.sqlite')
 
 export const createSession = (username: string) => {
   const sessionToken = cryptoRandomString({length: 21, type: 'base64'})

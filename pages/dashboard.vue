@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { user } = useUserSession()
-const { data } = await useFetch('/api/private-data')
+const { data } = await useLoginFetch('/api/private-data')
 </script>
 
 <template>

@@ -11,6 +11,8 @@ const publicRoutes = [
 const privateRoutes = [
   '/dashboard GET',
   '/api/private-data GET',
+  '/api/posts GET',
+  '/api/posts POST',
   '/api/_auth/session GET',
   '/api/_auth/session DELETE'
 ]

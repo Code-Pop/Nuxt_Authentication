@@ -1,4 +1,4 @@
-import { verifySession } from '@/utils/db'
+import { deleteSession, verifyCsrfToken, verifySession } from '@/utils/db'
 
 const publicRoutes = [
   '/',
@@ -13,6 +13,7 @@ const privateRoutes = [
   '/api/private-data GET',
   '/api/posts GET',
   '/api/posts POST',
+  '/api/csrf-token GET',
   '/api/_auth/session GET',
   '/api/_auth/session DELETE'
 ]
@@ -25,11 +26,25 @@ export default defineEventHandler(async (event) => {
         if (!verifySession(session.userId, session.token)) {
           throw createError({ status: 401 })
         }
+
+        if (event.method !== 'GET') {
+          const { csrfToken } = await readBody<{ csrfToken?: string }>(event)
+          if (typeof csrfToken !== 'string') {
+            throw createError({ status: 401 })
+          } else {
+            if (!verifyCsrfToken(session.userId, csrfToken)) {
+              throw createError({ status: 401 })
+            }
+          }
+        }
+
         if (event.path === '/api/_auth/session' && event.method === 'GET') {
           await sendWebResponse(event, Response.json({ user: session.user }))
         }
       } catch (error) {
         setCookie(event, 'nuxt-session', '')
+        const session = await requireUserSession(event)
+        deleteSession(session.userId)
         if (event.path.startsWith('/api/')) {
           throw error
         } else {

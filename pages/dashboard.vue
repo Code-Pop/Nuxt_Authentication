@@ -5,12 +5,14 @@ const { data: posts, refresh } = await useFetch('/api/posts')
 const inputContent = ref('')
 
 const submit = async () => {
+  const { csrfToken } = await $fetch('/api/csrf-token')
   const { error } = await $fetch('/api/posts', {
     method: 'POST',
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      csrfToken,
       content: inputContent.value
     })
   })

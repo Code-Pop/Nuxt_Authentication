@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import cryptoRandomString from 'crypto-random-string'
 import bcrypt from 'bcrypt'
+import jsonwebtoken from 'jsonwebtoken'
 
 export const db = new Database('db.sqlite')
 
@@ -86,14 +87,33 @@ export const getCsrfToken = (userId: string) => {
       `SELECT csrfToken FROM users WHERE id=?`
     )
     .get(userId)
-  return result?.csrfToken
+
+  const secret = process.env.NUXT_SESSION_PASSWORD
+  if (secret && secret.length === 32 && result) {
+    return jsonwebtoken.sign(
+      { csrfToken: result.csrfToken },
+      secret,
+      { expiresIn: 1 }
+    )
+  }
 }
 
-export const verifyCsrfToken = (userId: string, token: string) => {
-  const result = db
-    .prepare<[string], { csrfToken: string }>(
-      `SELECT csrfToken FROM users WHERE id=?`
-    )
-    .get(userId)
-  return result !== undefined ? result.csrfToken === token : false
+export const verifyCsrfToken = (userId: string, jwt: string) => {
+  const secret = process.env.NUXT_SESSION_PASSWORD
+  if (secret && secret.length === 32) {
+    try {
+      const payload = jsonwebtoken.verify(jwt, secret) as { csrfToken: string }
+      const token = payload.csrfToken
+      const result = db
+        .prepare<[string], { csrfToken: string }>(
+          `SELECT csrfToken FROM users WHERE id=?`
+        )
+        .get(userId)
+      return result !== undefined ? result.csrfToken === token : false
+    } catch {
+      return false
+    }
+  } else {
+    return false
+  }
 }
